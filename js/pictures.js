@@ -1,5 +1,18 @@
 'use strict';
 
+var MIN_LIKES_AMOUNT = 15;
+var MAX_LIKES_AMOUNT = 200;
+var MAX_COMMENTS_AMOUNT = 20;
+var MIN_COMMENTS_AMOUNT = 0;
+var IMG_ON_MAIN_AMOUNT = 25;
+var IMG_MAIN_WIDTH = 182;
+var IMG_MAIN_HEIGHT = 182;
+var IMG_AVATAR_MIN_INDEX = 1;
+var IMG_AVATAR_MAX_INDEX = 6;
+var IMG_AVATAR_WIDTH = 35;
+var IMG_AVATAR_HEIGHT = 35;
+var IMG_TO_SHOW_PER_CLICK = 5;
+
 var mockComments = [
   'Всё отлично!',
   'В целом всё неплохо. Но не всё.',
@@ -17,15 +30,19 @@ var mockDescription = [
   'Вот это тачка!'
 ];
 
-var getRandomList = function (comments, number, isComments) {
+var getRandomNumber = function (min, max) {
+  return Math.round(Math.random() * (max - min) + min);
+};
+
+var getRandomList = function (list, amount, isComments) {
   var commentList = [];
-  for (var i = 0; i < number; i++) {
+  for (var i = 0; i < amount; i++) {
     //  random choose amount of composite comments
-    var compositeNumber = isComments ? Math.round(Math.random() + 1) : 1;
-    compositeNumber = compositeNumber < comments.length ? compositeNumber : comments.length;
+    var compositeNumber = isComments ? getRandomNumber(1, 2) : 1;
+    compositeNumber = compositeNumber < list.length ? compositeNumber : list.length;
     var comment = '';
     for (var j = 0; j < compositeNumber; j++) {
-      comment += comments[Math.round(Math.random() * (comments.length - 1))];
+      comment += list[getRandomNumber(0, list.length - 1)];
     }
     commentList.push(comment);
   }
@@ -34,11 +51,11 @@ var getRandomList = function (comments, number, isComments) {
 
 var getMockImgList = function () {
   var mockImgList = [];
-  for (var i = 1; i <= 25; i++) {
+  for (var i = 1; i <= IMG_ON_MAIN_AMOUNT; i++) {
     var img = {};
     img.url = 'photos/' + i + '.jpg';
-    img.likes = Math.round(Math.random() * 185 + 15);
-    img.comments = getRandomList(mockComments, Math.round(Math.random() * 20), true);
+    img.likes = getRandomNumber(MIN_LIKES_AMOUNT, MAX_LIKES_AMOUNT);
+    img.comments = getRandomList(mockComments, getRandomNumber(MIN_COMMENTS_AMOUNT, MAX_COMMENTS_AMOUNT), true);
     img.description = getRandomList(mockDescription, 1, false);
     mockImgList.push(img);
   }
@@ -47,7 +64,7 @@ var getMockImgList = function () {
 
 var createDOMElement = function (type, classes, textContent) {
   var element = document.createElement(type);
-  //  check if classes is Array
+  //  check if classes variable is Array
   if (typeof classes === 'object') {
     for (var i = 0; i < classes.length; i++) {
       element.classList.add(classes[i]);
@@ -70,8 +87,8 @@ var drawPictures = function (pictures) {
     // <img> element
     var image = createDOMElement('img', 'picture__img');
     image.src = pictures[i].url;
-    image.width = 182;
-    image.height = 182;
+    image.width = IMG_MAIN_WIDTH;
+    image.height = IMG_MAIN_HEIGHT;
     image.alt = 'Случайная фотография';
     link.appendChild(image);
     // <p> element
@@ -90,13 +107,14 @@ var drawPictures = function (pictures) {
 
 var createComments = function (amount, image) {
   var commentFragment = document.createDocumentFragment();
-  for (var i = 0; i < amount; i++) {
+  var showAmount = amount < image.comments.length ? amount : image.comments.length;
+  for (var i = 0; i < showAmount; i++) {
     var li = createDOMElement('li', ['social__comment', 'social__comment--text']);
     var img = createDOMElement('img', 'social__picture');
-    img.src = 'img/avatar-' + Math.round(Math.random() * 5 + 1) + '.svg';
+    img.src = 'img/avatar-' + getRandomNumber(IMG_AVATAR_MIN_INDEX, IMG_AVATAR_MAX_INDEX) + '.svg';
     img.alt = 'Аватар комментатора фотографии';
-    img.width = 35;
-    img.height = 35;
+    img.width = IMG_AVATAR_WIDTH;
+    img.height = IMG_AVATAR_HEIGHT;
     commentFragment.appendChild(li);
     li.appendChild(img);
     li.appendChild(document.createTextNode(image.comments[i]));
@@ -109,7 +127,7 @@ var showBigPicture = function (image) {
   document.querySelector('.big-picture__img img').src = image.url;
   document.querySelector('.big-picture__social .likes-count').textContent = image.likes;
   document.querySelector('.big-picture__social .comments-count').textContent = image.comments.length;
-  document.querySelector('.social .social__comments').appendChild(createComments(3, image));
+  document.querySelector('.social .social__comments').appendChild(createComments(IMG_TO_SHOW_PER_CLICK, image));
   document.querySelector('.social__comment-count').classList.toggle('visually-hidden');
   document.querySelector('.social__comment-loadmore').classList.toggle('visually-hidden');
 };
