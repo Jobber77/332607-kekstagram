@@ -13,7 +13,15 @@ var IMG_AVATAR_MAX_INDEX = 6;
 var IMG_AVATAR_WIDTH = 35;
 var IMG_AVATAR_HEIGHT = 35;
 var IMG_TO_SHOW_PER_CLICK = 5;
+var ESC_KEYCODE = 27;
 //  endregion
+
+//  #region query variables
+var bigPicture = document.querySelector('.big-picture');
+var bigPictureCommentsContainer = document.querySelector('.social .social__comments');
+var imgPreview = document.querySelector('.img-upload__preview > img');
+
+//  #endregion
 
 var mockComments = [
   'Всё отлично!',
@@ -86,7 +94,7 @@ var drawPictures = function (pictures) {
   for (var i = 0; i < pictures.length; i++) {
     // <a> element
     var link = createDOMElement('a', 'picture__link');
-    //  link.href = pictures[i].url;
+    link.href = '#';
     // <img> element
     var image = createDOMElement('img', 'picture__img');
     image.src = pictures[i].url;
@@ -104,7 +112,7 @@ var drawPictures = function (pictures) {
     var likeSpan = createDOMElement('span', ['picture__stat', 'picture__stat--likes'], pictures[i].likes);
     statsParagraph.appendChild(likeSpan);
     // hidden span for storing id
-    var idSpan = createDOMElement('span', ['hidden', 'picture__id'], i);
+    var idSpan = createDOMElement('span', ['hidden', 'picture__id'], i.toString());
     statsParagraph.appendChild(idSpan);
     fragment.appendChild(link);
   }
@@ -128,30 +136,138 @@ var createComments = function (amount, image) {
   return commentFragment;
 };
 
+var fillBigPicture = function (imgObject) {
+  document.querySelector('.big-picture__img img').src = imgObject.url;
+  document.querySelector('.big-picture__social .likes-count').textContent = imgObject.likes;
+  document.querySelector('.big-picture__social .comments-count').textContent = imgObject.comments.length;
+  bigPictureCommentsContainer.innerHTML = '';
+  bigPictureCommentsContainer.appendChild(createComments(IMG_TO_SHOW_PER_CLICK, imgObject));
+};
+
 var showBigPicture = function (image) {
-  document.querySelector('.big-picture').classList.toggle('hidden');
-  document.querySelector('.big-picture__img img').src = image.url;
-  document.querySelector('.big-picture__social .likes-count').textContent = image.likes;
-  document.querySelector('.big-picture__social .comments-count').textContent = image.comments.length;
-  document.querySelector('.social .social__comments').appendChild(createComments(IMG_TO_SHOW_PER_CLICK, image));
-  document.querySelector('.social__comment-count').classList.toggle('visually-hidden');
-  document.querySelector('.social__comment-loadmore').classList.toggle('visually-hidden');
+  fillBigPicture(image);
+  bigPicture.classList.remove('hidden');
+  document.querySelector('#picture-cancel').addEventListener('click', hideBigPicture);
+  document.querySelector('.social__comment-count').classList.add('visually-hidden');
+  document.querySelector('.social__comment-loadmore').classList.add('visually-hidden');
+};
+
+var hideBigPicture = function () {
+  bigPicture.classList.add('hidden');
+  document.removeEventListener('keydown', onPopupEscPress);
+  document.querySelector('#picture-cancel').removeEventListener('click', hideBigPicture);
+  killFilterLiseners();
+};
+
+var showEditorForm = function () {
+  document.querySelector('.img-upload__overlay').classList.remove('hidden');
+  document.querySelector('#upload-cancel').addEventListener('click', hideEditorForm);
+  setFilterLiseners();
+};
+
+var hideEditorForm = function () {
+  document.querySelector('.img-upload__overlay').classList.add('hidden');
+  document.querySelector('#upload-file').value = '';
+  document.removeEventListener('keydown', onPopupEscPress);
+  document.querySelector('#upload-cancel').removeEventListener('click', hideEditorForm);
+};
+
+var findClickedObject = function (clickedDOMelement) {
+  var id = parseInt(clickedDOMelement.querySelector('.picture__id').textContent, 10);
+  var clickedImage = {};
+  for (var i = 0; i < mockImgList.length; i++) {
+    if (mockImgList[i].id === id) {
+      clickedImage = mockImgList[id];
+    }
+  }
+  return clickedImage;
 };
 
 var onPictureClick = function (evt) {
   var target = evt.target.closest('a');
   if (target) {
-    var id = parseInt(target.querySelector('.picture__id').textContent);
-    var clickedImage = {};
-    for (var i = 0; i < mockImgList.length; i++) {
-      if (mockImgList[i].id === id) {
-        clickedImage = mockImgList[id];
-      }
-    }
-    showBigPicture(clickedImage);
+    showBigPicture(findClickedObject(target));
+    document.addEventListener('keydown', onPopupEscPress);
+  }
+};
+
+var onFileInputClick = function () {
+  showEditorForm();
+  document.addEventListener('keydown', onPopupEscPress);
+};
+
+var onPopupEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    hideBigPicture();
+    hideEditorForm();
+  }
+};
+
+var clearFilters = function (img) {
+  img.classList.remove('effects__preview--none');
+  img.classList.remove('effects__preview--chrome');
+  img.classList.remove('effects__preview--sepia');
+  img.classList.remove('effects__preview--marvin');
+  img.classList.remove('effects__preview--phobos');
+  img.classList.remove('effects__preview--heat');
+};
+
+var setFilter = function (img, filterName) {
+  var filterClass = 'effects__preview--none';
+  switch (filterName) {
+    case 'chrome':
+      filterClass = 'effects__preview--chrome';
+      break;
+    case 'sepia':
+      filterClass = 'effects__preview--sepia';
+      break;
+    case 'marvin':
+      filterClass = 'effects__preview--marvin';
+      break;
+    case 'phobos':
+      filterClass = 'effects__preview--phobos';
+      break;
+    case 'heat':
+      filterClass = 'effects__preview--heat';
+      break;
+  }
+  clearFilters(img);
+  img.classList.add(filterClass);
+};
+
+var onFilterClick = function (env) {
+  if (env.target.classList.contains('effects__preview--chrome')) {
+    setFilter(imgPreview, 'chrome');
+  } else if (env.target.classList.contains('effects__preview--sepia')) {
+    setFilter(imgPreview, 'sepia');
+  } else if (env.target.classList.contains('effects__preview--marvin')) {
+    setFilter(imgPreview, 'marvin');
+  } else if (env.target.classList.contains('effects__preview--phobos')) {
+    setFilter(imgPreview, 'phobos');
+  } else if (env.target.classList.contains('effects__preview--heat')) {
+    setFilter(imgPreview, 'heat');
+  } else {
+    setFilter(imgPreview, 'none');
+  }
+};
+
+
+var setFilterLiseners = function () {
+  var filters = document.querySelectorAll('.effects__preview');
+  for (var i = 0; i < filters.length; i++) {
+    filters[i].addEventListener('click', onFilterClick);
+  }
+};
+
+var killFilterLiseners = function () {
+  var filters = document.querySelectorAll('.effects__preview');
+  for (var i = 0; i < filters.length; i++) {
+    filters[i].removeEventListener('click', onFilterClick);
   }
 };
 
 document.querySelector('.pictures').addEventListener('click', onPictureClick);
+document.querySelector('#upload-file').addEventListener('change', onFileInputClick);
+
 var mockImgList = getMockImgList();
 drawPictures(mockImgList);
