@@ -28,7 +28,7 @@ var imgPreview = document.querySelector('.img-upload__preview > img');
 var selectedfilter = 'none';
 var filterInput = document.querySelector('.scale__value');
 var filterSlider = document.querySelector('.img-upload__scale');
-var resizeValue =  document.querySelector('.resize__control--value');
+var resizeValue = document.querySelector('.resize__control--value');
 
 //  #endregion
 
@@ -247,9 +247,9 @@ var setMainLiseners = function () {
 var setFilter = function (img, filterName, pinSelectFlag) {
   var filterClass = 'effects__preview--none';
   var filterCSS = '';
-  //check if caller function is filter or pin and assign % of filter effect
+  //  check if caller function is filter or pin and assign % of filter effect
   var level = pinSelectFlag ? 0.3 : 1; // document.querySelector('.scale__pin').style.left - почему не возвращает значение left?
-  filterInput.value = level * 100;  // почему value filterInput не меняется в верстке?
+  filterInput.value = level * 100; // почему value filterInput не меняется в верстке?
   switch (filterName) {
     case 'chrome':
       filterClass = 'effects__preview--chrome';
@@ -290,7 +290,7 @@ var onFilterClick = function (env) {
   // check if object is found
   if (target) {
     if (target.value === 'chrome') {
-      selectedfilter = 'chrome'
+      selectedfilter = 'chrome';
     } else if (target.value === 'sepia') {
       selectedfilter = 'sepia';
     } else if (target.value === 'marvin') {
@@ -304,7 +304,7 @@ var onFilterClick = function (env) {
       hideSlider();
     }
   }
-  var pinSelectFlag = env.target.classList.contains('scale__pin') ? true : false ;
+  var pinSelectFlag = env.target.classList.contains('scale__pin') ? true : false;
   setFilter(imgPreview, selectedfilter, pinSelectFlag);
 };
 
@@ -329,18 +329,18 @@ var onPopupEscPress = function (evt) {
 };
 
 var onButtonResizeMinus = function () {
-  var value = parseInt(resizeValue.value);
+  var value = parseInt(resizeValue.value, 10);
   if (value > 0) {
     resizeValue.value = (value - 25) + '%';
-    imgPreview.style.transform = 'scale(' + (value - 25)/100 + ')';
+    imgPreview.style.transform = 'scale(' + (value - 25) / 100 + ')';
   }
 };
 
 var onButtonResizePlus = function () {
-  var value = parseInt(resizeValue.value);
+  var value = parseInt(resizeValue.value, 10);
   if (value < 100) {
     resizeValue.value = (value + 25) + '%';
-    imgPreview.style.transform = 'scale(' + (value + 25)/100 + ')';
+    imgPreview.style.transform = 'scale(' + (value + 25) / 100 + ')';
   }
 
 };
