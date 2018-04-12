@@ -14,12 +14,21 @@ var IMG_AVATAR_WIDTH = 35;
 var IMG_AVATAR_HEIGHT = 35;
 var IMG_TO_SHOW_PER_CLICK = 5;
 var ESC_KEYCODE = 27;
+var FILTER_MAX_VALUE_GRAYSCALE = 1;
+var FILTER_MAX_VALUE_SEPIA = 1;
+var FILTER_MAX_VALUE_INVERT = 100;
+var FILTER_MAX_VALUE_BLUR = 5;
+var FILTER_MAX_VALUE_BRIGHTNESS = 3;
 //  endregion
 
 //  #region query variables
 var bigPicture = document.querySelector('.big-picture');
 var bigPictureCommentsContainer = document.querySelector('.social .social__comments');
 var imgPreview = document.querySelector('.img-upload__preview > img');
+var selectedfilter = 'none';
+var filterInput = document.querySelector('.scale__value');
+var filterSlider = document.querySelector('.img-upload__scale');
+var resizeValue =  document.querySelector('.resize__control--value');
 
 //  #endregion
 
@@ -162,7 +171,16 @@ var hideBigPicture = function () {
 var showEditorForm = function () {
   document.querySelector('.img-upload__overlay').classList.remove('hidden');
   document.querySelector('#upload-cancel').addEventListener('click', hideEditorForm);
+  configureEditorForm();
   setFilterLiseners();
+
+};
+
+var configureEditorForm = function () {
+  resizeValue.value = '100%';
+  clearFilters(imgPreview);
+  hideSlider();
+  document.querySelector('#effect-none').checked = true;
 };
 
 var hideEditorForm = function () {
@@ -172,7 +190,7 @@ var hideEditorForm = function () {
   document.querySelector('#upload-cancel').removeEventListener('click', hideEditorForm);
 };
 
-var findClickedObject = function (clickedDOMelement) {
+var findClickedPictureObject = function (clickedDOMelement) {
   var id = parseInt(clickedDOMelement.querySelector('.picture__id').textContent, 10);
   var clickedImage = {};
   for (var i = 0; i < mockImgList.length; i++) {
@@ -183,10 +201,117 @@ var findClickedObject = function (clickedDOMelement) {
   return clickedImage;
 };
 
+var clearFilters = function (img) {
+  img.classList.remove('effects__preview--none');
+  img.classList.remove('effects__preview--chrome');
+  img.classList.remove('effects__preview--sepia');
+  img.classList.remove('effects__preview--marvin');
+  img.classList.remove('effects__preview--phobos');
+  img.classList.remove('effects__preview--heat');
+  img.style.filter = '';
+};
+
+var setFilterLiseners = function () {
+  var filters = document.querySelectorAll('.effects__radio');
+  for (var i = 0; i < filters.length; i++) {
+    filters[i].addEventListener('click', onFilterClick);
+  }
+  document.querySelector('.scale__pin').addEventListener('click', onFilterClick);
+  document.querySelector('.resize__control--minus').addEventListener('click', onButtonResizeMinus);
+  document.querySelector('.resize__control--plus').addEventListener('click', onButtonResizePlus);
+};
+
+var killFilterLiseners = function () {
+  var filters = document.querySelectorAll('.effects__preview');
+  for (var i = 0; i < filters.length; i++) {
+    filters[i].removeEventListener('click', onFilterClick);
+  }
+  document.querySelector('.scale__pin').removeEventListener('click', onFilterClick);
+  document.querySelector('.resize__control--minus').removeEventListener('click', onButtonResizeMinus);
+  document.querySelector('.resize__control--plus').removeEventListener('click', onButtonResizePlus);
+};
+
+var showSlider = function () {
+  filterSlider.classList.remove('hidden');
+};
+
+var hideSlider = function () {
+  filterSlider.classList.add('hidden');
+};
+
+var setMainLiseners = function () {
+  document.querySelector('.pictures').addEventListener('click', onPictureClick);
+  document.querySelector('#upload-file').addEventListener('change', onFileInputClick);
+};
+
+var setFilter = function (img, filterName, pinSelectFlag) {
+  var filterClass = 'effects__preview--none';
+  var filterCSS = '';
+  //check if caller function is filter or pin and assign % of filter effect
+  var level = pinSelectFlag ? 0.3 : 1; // document.querySelector('.scale__pin').style.left - почему не возвращает значение left?
+  filterInput.value = level * 100;  // почему value filterInput не меняется в верстке?
+  switch (filterName) {
+    case 'chrome':
+      filterClass = 'effects__preview--chrome';
+      filterCSS = 'grayscale';
+      level *= FILTER_MAX_VALUE_GRAYSCALE;
+      break;
+    case 'sepia':
+      filterClass = 'effects__preview--sepia';
+      filterCSS = 'sepia';
+      level *= FILTER_MAX_VALUE_SEPIA;
+      break;
+    case 'marvin':
+      filterClass = 'effects__preview--marvin';
+      filterCSS = 'invert';
+      level = level * FILTER_MAX_VALUE_INVERT + '%';
+      break;
+    case 'phobos':
+      filterClass = 'effects__preview--phobos';
+      filterCSS = 'blur';
+      level = level * FILTER_MAX_VALUE_BLUR + 'px';
+      break;
+    case 'heat':
+      filterClass = 'effects__preview--heat';
+      filterCSS = 'brightness';
+      level *= FILTER_MAX_VALUE_BRIGHTNESS;
+      break;
+  }
+  clearFilters(img);
+  img.classList.add(filterClass);
+  if (filterCSS) {
+    img.style.filter = filterCSS + '(' + level + ')';
+  }
+};
+
+var onFilterClick = function (env) {
+  var target = env.target.closest('input');
+  showSlider();
+  // check if object is found
+  if (target) {
+    if (target.value === 'chrome') {
+      selectedfilter = 'chrome'
+    } else if (target.value === 'sepia') {
+      selectedfilter = 'sepia';
+    } else if (target.value === 'marvin') {
+      selectedfilter = 'marvin';
+    } else if (target.value === 'phobos') {
+      selectedfilter = 'phobos';
+    } else if (target.value === 'heat') {
+      selectedfilter = 'heat';
+    } else if (target.value === 'none') {
+      selectedfilter = 'none';
+      hideSlider();
+    }
+  }
+  var pinSelectFlag = env.target.classList.contains('scale__pin') ? true : false ;
+  setFilter(imgPreview, selectedfilter, pinSelectFlag);
+};
+
 var onPictureClick = function (evt) {
   var target = evt.target.closest('a');
   if (target) {
-    showBigPicture(findClickedObject(target));
+    showBigPicture(findClickedPictureObject(target));
     document.addEventListener('keydown', onPopupEscPress);
   }
 };
@@ -203,71 +328,23 @@ var onPopupEscPress = function (evt) {
   }
 };
 
-var clearFilters = function (img) {
-  img.classList.remove('effects__preview--none');
-  img.classList.remove('effects__preview--chrome');
-  img.classList.remove('effects__preview--sepia');
-  img.classList.remove('effects__preview--marvin');
-  img.classList.remove('effects__preview--phobos');
-  img.classList.remove('effects__preview--heat');
-};
-
-var setFilter = function (img, filterName) {
-  var filterClass = 'effects__preview--none';
-  switch (filterName) {
-    case 'chrome':
-      filterClass = 'effects__preview--chrome';
-      break;
-    case 'sepia':
-      filterClass = 'effects__preview--sepia';
-      break;
-    case 'marvin':
-      filterClass = 'effects__preview--marvin';
-      break;
-    case 'phobos':
-      filterClass = 'effects__preview--phobos';
-      break;
-    case 'heat':
-      filterClass = 'effects__preview--heat';
-      break;
-  }
-  clearFilters(img);
-  img.classList.add(filterClass);
-};
-
-var onFilterClick = function (env) {
-  if (env.target.classList.contains('effects__preview--chrome')) {
-    setFilter(imgPreview, 'chrome');
-  } else if (env.target.classList.contains('effects__preview--sepia')) {
-    setFilter(imgPreview, 'sepia');
-  } else if (env.target.classList.contains('effects__preview--marvin')) {
-    setFilter(imgPreview, 'marvin');
-  } else if (env.target.classList.contains('effects__preview--phobos')) {
-    setFilter(imgPreview, 'phobos');
-  } else if (env.target.classList.contains('effects__preview--heat')) {
-    setFilter(imgPreview, 'heat');
-  } else {
-    setFilter(imgPreview, 'none');
+var onButtonResizeMinus = function () {
+  var value = parseInt(resizeValue.value);
+  if (value > 0) {
+    resizeValue.value = (value - 25) + '%';
+    imgPreview.style.transform = 'scale(' + (value - 25)/100 + ')';
   }
 };
 
-
-var setFilterLiseners = function () {
-  var filters = document.querySelectorAll('.effects__preview');
-  for (var i = 0; i < filters.length; i++) {
-    filters[i].addEventListener('click', onFilterClick);
+var onButtonResizePlus = function () {
+  var value = parseInt(resizeValue.value);
+  if (value < 100) {
+    resizeValue.value = (value + 25) + '%';
+    imgPreview.style.transform = 'scale(' + (value + 25)/100 + ')';
   }
-};
 
-var killFilterLiseners = function () {
-  var filters = document.querySelectorAll('.effects__preview');
-  for (var i = 0; i < filters.length; i++) {
-    filters[i].removeEventListener('click', onFilterClick);
-  }
 };
-
-document.querySelector('.pictures').addEventListener('click', onPictureClick);
-document.querySelector('#upload-file').addEventListener('change', onFileInputClick);
 
 var mockImgList = getMockImgList();
 drawPictures(mockImgList);
+setMainLiseners();
