@@ -6,8 +6,6 @@ var MAX_LIKES_AMOUNT = 200;
 var MAX_COMMENTS_AMOUNT = 20;
 var MIN_COMMENTS_AMOUNT = 0;
 var IMG_ON_MAIN_AMOUNT = 25;
-var IMG_MAIN_WIDTH = 182;
-var IMG_MAIN_HEIGHT = 182;
 var IMG_AVATAR_MIN_INDEX = 1;
 var IMG_AVATAR_MAX_INDEX = 6;
 var IMG_AVATAR_WIDTH = 35;
@@ -100,31 +98,19 @@ var createDOMElement = function (type, classes, textContent) {
 
 var drawPictures = function (pictures) {
   var fragment = document.createDocumentFragment();
-  for (var i = 0; i < pictures.length; i++) {
-    // <a> element
-    var link = createDOMElement('a', 'picture__link');
-    link.href = '#';
-    // <img> element
-    var image = createDOMElement('img', 'picture__img');
-    image.src = pictures[i].url;
-    image.width = IMG_MAIN_WIDTH;
-    image.height = IMG_MAIN_HEIGHT;
-    image.alt = 'Случайная фотография';
-    link.appendChild(image);
-    // <p> element
-    var statsParagraph = createDOMElement('p', 'picture__stats');
-    link.appendChild(statsParagraph);
-    // <span> comments element
-    var commentSpan = createDOMElement('span', ['picture__stat', 'picture__stat--comments'], pictures[i].comments.length);
-    statsParagraph.appendChild(commentSpan);
-    // <span> likes element
-    var likeSpan = createDOMElement('span', ['picture__stat', 'picture__stat--likes'], pictures[i].likes);
-    statsParagraph.appendChild(likeSpan);
+  pictures.forEach(function (picture) {
+    var template = document.querySelector('#picture').content.cloneNode(true);
+    var image = template.querySelector('.picture__img');
+    image.src = picture.url;
+    var commentSpan = template.querySelector('.picture__stat--comments');
+    commentSpan.textContent = picture.comments.length;
+    var likeSpan = template.querySelector('.picture__stat--likes');
+    likeSpan.textContent = picture.likes;
     // hidden span for storing id
-    var idSpan = createDOMElement('span', ['hidden', 'picture__id'], i.toString());
-    statsParagraph.appendChild(idSpan);
-    fragment.appendChild(link);
-  }
+    var idSpan = createDOMElement('span', ['hidden', 'picture__id'], pictures.indexOf(picture).toString());
+    template.querySelector('p').appendChild(idSpan);
+    fragment.appendChild(template);
+  });
   document.querySelector('.pictures').appendChild(fragment);
 };
 
