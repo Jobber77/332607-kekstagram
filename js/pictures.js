@@ -29,6 +29,7 @@ var filterSlider = document.querySelector('.img-upload__scale');
 var resizeValue = document.querySelector('.resize__control--value');
 var textAreaUpload = document.querySelector('.text__description');
 var inputTagUpload = document.querySelector('.text__hashtags');
+var inputFile = document.querySelector('#upload-file');
 
 //  #endregion
 
@@ -167,10 +168,17 @@ var showEditorForm = function () {
 var hideEditorForm = function () {
   document.querySelector('.img-upload__overlay').classList.add('hidden');
   document.querySelector('#upload-file').value = '';
-  clearFilters(imgPreview);
   document.removeEventListener('keydown', onPopupEscPress);
   document.querySelector('#upload-cancel').removeEventListener('click', hideEditorForm);
+  clearFilters(imgPreview);
+  clearEditForm();
   killInputLiseners();
+};
+
+var clearEditForm = function () {
+  inputTagUpload.value = '';
+  textAreaUpload.value = '';
+  inputFile.value = '';
 };
 
 var configureEditorForm = function () {
@@ -182,7 +190,7 @@ var configureEditorForm = function () {
 var setInputLiseners = function () {
   textAreaUpload.addEventListener('focus', onInputFocus);
   inputTagUpload.addEventListener('focus', onInputFocus);
-  document.querySelector('.img-upload__submit').addEventListener('click', onInputTagValidation);
+  inputTagUpload.addEventListener('blur', onInputTagValidation);
   textAreaUpload.addEventListener('blur', onInputFocusLost);
   inputTagUpload.addEventListener('blur', onInputFocusLost);
 };
@@ -190,7 +198,7 @@ var setInputLiseners = function () {
 var killInputLiseners = function () {
   textAreaUpload.removeEventListener('focus', onInputFocus);
   inputTagUpload.removeEventListener('focus', onInputFocus);
-  document.querySelector('.img-upload__submit').removeEventListener('click', onInputTagValidation);
+  inputTagUpload.removeEventListener('blur', onInputTagValidation);
   textAreaUpload.removeEventListener('blur', onInputFocusLost);
   inputTagUpload.removeEventListener('blur', onInputFocusLost);
 };
@@ -363,6 +371,7 @@ var onInputTagValidation = function (evt) {
   var errorList = validateTags(input.value);
   if (errorList) {
     input.setCustomValidity(errorList.toString());
+    input.style.border = "2px solid red";
   } else {
     input.setCustomValidity('');
   }
