@@ -101,18 +101,17 @@ var createDOMElement = function (type, classes, textContent) {
 
 var drawPictures = function (pictures) {
   var fragment = document.createDocumentFragment();
+  var template = document.querySelector('#picture').content;
   pictures.forEach(function (picture) {
-    var template = document.querySelector('#picture').content.cloneNode(true);
-    var image = template.querySelector('.picture__img');
+    var aElementToClone = template.querySelector('.picture__link').cloneNode(true);
+    aElementToClone.pictureId = pictures.indexOf(picture);
+    var image = aElementToClone.querySelector('.picture__img');
     image.src = picture.url;
-    var commentSpan = template.querySelector('.picture__stat--comments');
+    var commentSpan = aElementToClone.querySelector('.picture__stat--comments');
     commentSpan.textContent = picture.comments.length;
-    var likeSpan = template.querySelector('.picture__stat--likes');
+    var likeSpan = aElementToClone.querySelector('.picture__stat--likes');
     likeSpan.textContent = picture.likes;
-    // hidden span for storing id
-    var idSpan = createDOMElement('span', ['hidden', 'picture__id'], pictures.indexOf(picture).toString());
-    template.querySelector('p').appendChild(idSpan);
-    fragment.appendChild(template);
+    fragment.appendChild(aElementToClone);
   });
   document.querySelector('.pictures').appendChild(fragment);
 };
@@ -205,7 +204,7 @@ var killInputLiseners = function () {
 };
 
 var findClickedPictureObject = function (clickedDOMelement) {
-  var id = parseInt(clickedDOMelement.querySelector('.picture__id').textContent, 10);
+  var id = clickedDOMelement.pictureId;
   var clickedImage = {};
   for (var i = 0; i < mockImgList.length; i++) {
     if (mockImgList[i].id === id) {
