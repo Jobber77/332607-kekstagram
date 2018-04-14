@@ -123,7 +123,8 @@ var createComments = function (amount, image) {
   for (var i = 0; i < showAmount; i++) {
     var li = createDOMElement('li', ['social__comment', 'social__comment--text']);
     var img = createDOMElement('img', 'social__picture');
-    img.src = 'img/avatar-' + getRandomNumber(IMG_AVATAR_MIN_INDEX, IMG_AVATAR_MAX_INDEX) + '.svg';
+    var randomImgNumber = getRandomNumber(IMG_AVATAR_MIN_INDEX, IMG_AVATAR_MAX_INDEX);
+    img.src = 'img/avatar-' + randomImgNumber + '.svg';
     img.alt = 'Аватар комментатора фотографии';
     img.width = IMG_AVATAR_WIDTH;
     img.height = IMG_AVATAR_HEIGHT;
@@ -302,19 +303,26 @@ var onFilterClick = function (env) {
   showSlider();
   // check if object is found
   if (target) {
-    if (target.value === 'chrome') {
-      selectedfilter = 'chrome';
-    } else if (target.value === 'sepia') {
-      selectedfilter = 'sepia';
-    } else if (target.value === 'marvin') {
-      selectedfilter = 'marvin';
-    } else if (target.value === 'phobos') {
-      selectedfilter = 'phobos';
-    } else if (target.value === 'heat') {
-      selectedfilter = 'heat';
-    } else if (target.value === 'none') {
-      selectedfilter = 'none';
-      hideSlider();
+    switch (target.value) {
+      case 'chrome':
+        selectedfilter = 'chrome';
+        break;
+      case 'sepia':
+        selectedfilter = 'sepia';
+        break;
+      case 'marvin':
+        selectedfilter = 'marvin';
+        break;
+      case 'phobos':
+        selectedfilter = 'phobos';
+        break;
+      case 'heat':
+        selectedfilter = 'heat';
+        break;
+      case 'none':
+        selectedfilter = 'none';
+        hideSlider();
+        break;
     }
   }
   var pinSelectFlag = env.target.classList.contains('scale__pin') ? true : false;
@@ -371,7 +379,7 @@ var onInputTagValidation = function (evt) {
   var errorList = validateTags(input.value);
   if (errorList) {
     input.setCustomValidity(errorList.toString());
-    input.style.border = "2px solid red";
+    input.style.border = '2px solid red';
   } else {
     input.setCustomValidity('');
   }
