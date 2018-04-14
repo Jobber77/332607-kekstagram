@@ -24,12 +24,15 @@ var bigPicture = document.querySelector('.big-picture');
 var bigPictureCommentsContainer = document.querySelector('.social .social__comments');
 var imgPreview = document.querySelector('.img-upload__preview > img');
 var selectedfilter = 'none';
-var filterInput = document.querySelector('.scale__value');
 var filterSlider = document.querySelector('.img-upload__scale');
 var resizeValue = document.querySelector('.resize__control--value');
 var textAreaUpload = document.querySelector('.text__description');
 var inputTagUpload = document.querySelector('.text__hashtags');
 var inputFile = document.querySelector('#upload-file');
+var pin = document.querySelector('.scale__pin');
+var scaleLine = document.querySelector('.scale__line');
+var scaleValue = document.querySelector('.scale__value');
+var scaleLevel = document.querySelector('.scale__level');
 
 //  #endregion
 
@@ -229,9 +232,9 @@ var setFilterLiseners = function () {
   for (var i = 0; i < filters.length; i++) {
     filters[i].addEventListener('click', onFilterClick);
   }
-  document.querySelector('.scale__pin').addEventListener('click', onFilterClick);
   document.querySelector('.resize__control--minus').addEventListener('click', onButtonResizeMinus);
   document.querySelector('.resize__control--plus').addEventListener('click', onButtonResizePlus);
+  pin.addEventListener('mousedown', onPinMove);
 };
 
 var killFilterLiseners = function () {
@@ -239,9 +242,9 @@ var killFilterLiseners = function () {
   for (var i = 0; i < filters.length; i++) {
     filters[i].removeEventListener('click', onFilterClick);
   }
-  document.querySelector('.scale__pin').removeEventListener('click', onFilterClick);
   document.querySelector('.resize__control--minus').removeEventListener('click', onButtonResizeMinus);
   document.querySelector('.resize__control--plus').removeEventListener('click', onButtonResizePlus);
+  pin.removeEventListener('mousedown', onPinMove);
 };
 
 var showSlider = function () {
@@ -257,12 +260,10 @@ var setMainLiseners = function () {
   document.querySelector('#upload-file').addEventListener('change', onFileInputClick);
 };
 
-var setFilter = function (img, filterName, pinSelectFlag) {
+var setFilter = function (img, filterName, filterIntensiveness) {
   var filterClass = 'effects__preview--none';
   var filterCSS = '';
-  //  check if caller function is filter or pin and assign % of filter effect
-  var level = pinSelectFlag ? 0.3 : 1; // document.querySelector('.scale__pin').style.left - почему не возвращает значение left?
-  filterInput.value = level * 100; // почему value filterInput не меняется в верстке?
+  var level = filterIntensiveness;
   switch (filterName) {
     case 'chrome':
       filterClass = 'effects__preview--chrome';
@@ -324,8 +325,15 @@ var onFilterClick = function (env) {
         break;
     }
   }
-  var pinSelectFlag = env.target.classList.contains('scale__pin') ? true : false;
-  setFilter(imgPreview, selectedfilter, pinSelectFlag);
+  setFilter(imgPreview, selectedfilter, 1);
+  setInitialPinPostition();
+};
+
+var setInitialPinPostition = function () {
+  //  почему в верстке не меняется атрибуты pin и scaleValue?
+  pin.style.Left = scaleLine.offsetWidth + 'px';
+  scaleLevel.style.width = scaleLine.offsetWidth + 'px';
+  scaleValue.value = 1;
 };
 
 var onPictureClick = function (evt) {
@@ -422,6 +430,42 @@ var checkForDuplicate = function (list, item) {
     }
   });
   return counter > 1 ? true : false;
+};
+
+var onPinMove = function (evt) {
+  evt.preventDefault();
+  var startXCoords = evt.clientX;
+
+  var onMouseMove = function (moveEvt) {
+    moveEvt.preventDefault();
+    calculateNewPosition(moveEvt);
+  };
+
+  var onMouseUp = function (upEvt) {
+    upEvt.preventDefault();
+    calculateNewPosition(upEvt);
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+
+  var calculateNewPosition = function (moveEvent) {
+    var shift = startXCoords - moveEvent.clientX;
+    var newPosition = pin.offsetLeft - shift;
+    if (newPosition <= 0) {
+      newPosition = 0;
+    }
+    if (newPosition > scaleLine.offsetWidth) {
+      newPosition = scaleLine.offsetWidth;
+    }
+    startXCoords = moveEvent.clientX;
+    pin.style.left = newPosition + 'px';
+    scaleLevel.style.width = newPosition + 'px';
+    scaleValue.value = newPosition / scaleLine.offsetWidth;
+    setFilter(imgPreview, selectedfilter, scaleValue.value);
+  };
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
 };
 
 var mockImgList = getMockImgList();
