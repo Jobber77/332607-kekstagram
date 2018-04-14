@@ -27,6 +27,9 @@ var selectedfilter = 'none';
 var filterInput = document.querySelector('.scale__value');
 var filterSlider = document.querySelector('.img-upload__scale');
 var resizeValue = document.querySelector('.resize__control--value');
+var textAreaUpload = document.querySelector('.text__description');
+var inputTagUpload = document.querySelector('.text__hashtags');
+var inputFile = document.querySelector('#upload-file');
 
 //  #endregion
 
@@ -98,18 +101,17 @@ var createDOMElement = function (type, classes, textContent) {
 
 var drawPictures = function (pictures) {
   var fragment = document.createDocumentFragment();
+  var template = document.querySelector('#picture').content;
   pictures.forEach(function (picture) {
-    var template = document.querySelector('#picture').content.cloneNode(true);
-    var image = template.querySelector('.picture__img');
+    var aElementToClone = template.querySelector('.picture__link').cloneNode(true);
+    aElementToClone.pictureId = pictures.indexOf(picture);
+    var image = aElementToClone.querySelector('.picture__img');
     image.src = picture.url;
-    var commentSpan = template.querySelector('.picture__stat--comments');
+    var commentSpan = aElementToClone.querySelector('.picture__stat--comments');
     commentSpan.textContent = picture.comments.length;
-    var likeSpan = template.querySelector('.picture__stat--likes');
+    var likeSpan = aElementToClone.querySelector('.picture__stat--likes');
     likeSpan.textContent = picture.likes;
-    // hidden span for storing id
-    var idSpan = createDOMElement('span', ['hidden', 'picture__id'], pictures.indexOf(picture).toString());
-    template.querySelector('p').appendChild(idSpan);
-    fragment.appendChild(template);
+    fragment.appendChild(aElementToClone);
   });
   document.querySelector('.pictures').appendChild(fragment);
 };
@@ -120,7 +122,8 @@ var createComments = function (amount, image) {
   for (var i = 0; i < showAmount; i++) {
     var li = createDOMElement('li', ['social__comment', 'social__comment--text']);
     var img = createDOMElement('img', 'social__picture');
-    img.src = 'img/avatar-' + getRandomNumber(IMG_AVATAR_MIN_INDEX, IMG_AVATAR_MAX_INDEX) + '.svg';
+    var randomImgNumber = getRandomNumber(IMG_AVATAR_MIN_INDEX, IMG_AVATAR_MAX_INDEX);
+    img.src = 'img/avatar-' + randomImgNumber + '.svg';
     img.alt = 'Аватар комментатора фотографии';
     img.width = IMG_AVATAR_WIDTH;
     img.height = IMG_AVATAR_HEIGHT;
@@ -142,9 +145,9 @@ var fillBigPicture = function (imgObject) {
 var showBigPicture = function (image) {
   fillBigPicture(image);
   bigPicture.classList.remove('hidden');
-  document.querySelector('#picture-cancel').addEventListener('click', hideBigPicture);
   document.querySelector('.social__comment-count').classList.add('visually-hidden');
   document.querySelector('.social__comment-loadmore').classList.add('visually-hidden');
+  document.querySelector('#picture-cancel').addEventListener('click', hideBigPicture);
 };
 
 var hideBigPicture = function () {
@@ -156,17 +159,10 @@ var hideBigPicture = function () {
 
 var showEditorForm = function () {
   document.querySelector('.img-upload__overlay').classList.remove('hidden');
-  document.querySelector('#upload-cancel').addEventListener('click', hideEditorForm);
   configureEditorForm();
   setFilterLiseners();
-
-};
-
-var configureEditorForm = function () {
-  resizeValue.value = '100%';
-  clearFilters(imgPreview);
-  hideSlider();
-  document.querySelector('#effect-none').checked = true;
+  setInputLiseners();
+  document.querySelector('#upload-cancel').addEventListener('click', hideEditorForm);
 };
 
 var hideEditorForm = function () {
@@ -174,10 +170,41 @@ var hideEditorForm = function () {
   document.querySelector('#upload-file').value = '';
   document.removeEventListener('keydown', onPopupEscPress);
   document.querySelector('#upload-cancel').removeEventListener('click', hideEditorForm);
+  clearFilters(imgPreview);
+  clearEditForm();
+  killInputLiseners();
+};
+
+var clearEditForm = function () {
+  inputTagUpload.value = '';
+  textAreaUpload.value = '';
+  inputFile.value = '';
+};
+
+var configureEditorForm = function () {
+  resizeValue.value = '100%';
+  hideSlider();
+  document.querySelector('#effect-none').checked = true;
+};
+
+var setInputLiseners = function () {
+  textAreaUpload.addEventListener('focus', onInputFocus);
+  inputTagUpload.addEventListener('focus', onInputFocus);
+  inputTagUpload.addEventListener('blur', onInputTagValidation);
+  textAreaUpload.addEventListener('blur', onInputFocusLost);
+  inputTagUpload.addEventListener('blur', onInputFocusLost);
+};
+
+var killInputLiseners = function () {
+  textAreaUpload.removeEventListener('focus', onInputFocus);
+  inputTagUpload.removeEventListener('focus', onInputFocus);
+  inputTagUpload.removeEventListener('blur', onInputTagValidation);
+  textAreaUpload.removeEventListener('blur', onInputFocusLost);
+  inputTagUpload.removeEventListener('blur', onInputFocusLost);
 };
 
 var findClickedPictureObject = function (clickedDOMelement) {
-  var id = parseInt(clickedDOMelement.querySelector('.picture__id').textContent, 10);
+  var id = clickedDOMelement.pictureId;
   var clickedImage = {};
   for (var i = 0; i < mockImgList.length; i++) {
     if (mockImgList[i].id === id) {
@@ -208,7 +235,7 @@ var setFilterLiseners = function () {
 };
 
 var killFilterLiseners = function () {
-  var filters = document.querySelectorAll('.effects__preview');
+  var filters = document.querySelectorAll('.effects__radio');
   for (var i = 0; i < filters.length; i++) {
     filters[i].removeEventListener('click', onFilterClick);
   }
@@ -275,19 +302,26 @@ var onFilterClick = function (env) {
   showSlider();
   // check if object is found
   if (target) {
-    if (target.value === 'chrome') {
-      selectedfilter = 'chrome';
-    } else if (target.value === 'sepia') {
-      selectedfilter = 'sepia';
-    } else if (target.value === 'marvin') {
-      selectedfilter = 'marvin';
-    } else if (target.value === 'phobos') {
-      selectedfilter = 'phobos';
-    } else if (target.value === 'heat') {
-      selectedfilter = 'heat';
-    } else if (target.value === 'none') {
-      selectedfilter = 'none';
-      hideSlider();
+    switch (target.value) {
+      case 'chrome':
+        selectedfilter = 'chrome';
+        break;
+      case 'sepia':
+        selectedfilter = 'sepia';
+        break;
+      case 'marvin':
+        selectedfilter = 'marvin';
+        break;
+      case 'phobos':
+        selectedfilter = 'phobos';
+        break;
+      case 'heat':
+        selectedfilter = 'heat';
+        break;
+      case 'none':
+        selectedfilter = 'none';
+        hideSlider();
+        break;
     }
   }
   var pinSelectFlag = env.target.classList.contains('scale__pin') ? true : false;
@@ -329,6 +363,65 @@ var onButtonResizePlus = function () {
     imgPreview.style.transform = 'scale(' + (value + 25) / 100 + ')';
   }
 
+};
+
+var onInputFocus = function () {
+  document.removeEventListener('keydown', onPopupEscPress);
+};
+
+var onInputFocusLost = function () {
+  document.addEventListener('keydown', onPopupEscPress);
+};
+
+var onInputTagValidation = function (evt) {
+  var input = evt.target.closest('input');
+  var errorList = validateTags(input.value);
+  if (errorList) {
+    input.setCustomValidity(errorList.toString());
+    input.style.border = '2px solid red';
+  } else {
+    input.setCustomValidity('');
+  }
+};
+
+var validateTags = function (string) {
+  var errors = [];
+  var tags = string.split(' ');
+  var flagLength = false;
+  var flagStartFromSharp = false;
+  var flagTooShort = false;
+  var flagDuplicate = false;
+  tags.forEach(function (tag) {
+    //  normalize
+    tag = tag.trim();
+    if (tag[0] !== '#' && !flagStartFromSharp) {
+      errors.push('Теги должны начинаться с #');
+      flagStartFromSharp = true;
+    } else if (tag.length <= 1 && !flagTooShort) {
+      errors.push('Теги должны содержать не менее 2 символов');
+      flagTooShort = true;
+    } else if (tag.length > 20 && !flagLength) {
+      errors.push('Теги должны содержать не более 20 символов');
+      flagLength = true;
+    } else if (checkForDuplicate(tags, tag) && !flagDuplicate) {
+      errors.push('Теги не должны повторяться. Регистр не учитывается.');
+      flagDuplicate = true;
+    }
+  });
+  if (tags.length > 5) {
+    errors.push('Максимальное количество тегов - 5');
+  }
+  return errors;
+};
+
+var checkForDuplicate = function (list, item) {
+  var counter = 0;
+  list.forEach(function (listItem) {
+    if (listItem.toLowerCase() === item.toLowerCase()) {
+      counter++;
+    }
+  });
+  return counter > 1 ? true : false;
 };
 
 var mockImgList = getMockImgList();
