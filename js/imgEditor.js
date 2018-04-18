@@ -30,27 +30,6 @@
     document.querySelector('#effect-none').checked = true;
   };
 
-  //  expose
-  window.imgEditor = {
-    showEditorForm: function () {
-      document.querySelector('.img-upload__overlay').classList.remove('hidden');
-      configureEditorForm();
-      setFilterLiseners();
-      setInputLiseners();
-      document.querySelector('#upload-cancel').addEventListener('click', this.hideEditorForm);
-    },
-    hideEditorForm: function () {
-      document.querySelector('.img-upload__overlay').classList.add('hidden');
-      document.querySelector('#upload-file').value = '';
-      document.removeEventListener('keydown', window.util.onPopupEscPress);
-      document.querySelector('#upload-cancel').removeEventListener('click', this.hideEditorForm);
-      clearFilters(imgPreview);
-      clearEditForm();
-      killInputLiseners();
-      killFilterLiseners();
-    }
-  };
-
   var clearEditForm = function () {
     inputTagUpload.value = '';
     textAreaUpload.value = '';
@@ -151,7 +130,7 @@
 
   var setInitialPinPostition = function () {
     //  почему в верстке не меняется атрибуты pin и scaleValue?
-    pin.style.Left = scaleLine.offsetWidth + 'px';
+    pin.style.left = scaleLine.offsetWidth + 'px';
     scaleLevel.style.width = scaleLine.offsetWidth + 'px';
     scaleValue.value = 1;
   };
@@ -301,5 +280,31 @@
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
   };
+
+  //  expose
+  var showEditorForm = function () {
+    document.querySelector('.img-upload__overlay').classList.remove('hidden');
+    configureEditorForm();
+    setFilterLiseners();
+    setInputLiseners();
+    document.querySelector('#upload-cancel').addEventListener('click', this.hideEditorForm);
+  };
+
+  var hideEditorForm = function () {
+    document.querySelector('.img-upload__overlay').classList.add('hidden');
+    document.querySelector('#upload-file').value = '';
+    document.removeEventListener('keydown', window.util.onPopupEscPress);
+    document.querySelector('#upload-cancel').removeEventListener('click', this.hideEditorForm);
+    clearFilters(imgPreview);
+    clearEditForm();
+    killInputLiseners();
+    killFilterLiseners();
+  }
+
+  window.imgEditor = {
+    showEditorForm,
+    hideEditorForm
+  };
+
 })();
 

@@ -37,19 +37,22 @@
     }
     return commentFragment;
   };
+
   //  expose
+  var hideImgPreview = function () {
+    bigPicture.classList.add('hidden');
+    document.removeEventListener('keydown', window.util.onPopupEscPress);
+    document.querySelector('#picture-cancel').removeEventListener('click', this.hideImgPreview);
+  };
+  var showImgPreview = function (image) {
+    fillImgPreview(image);
+    bigPicture.classList.remove('hidden');
+    document.querySelector('.social__comment-count').classList.add('visually-hidden');
+    document.querySelector('.social__comment-loadmore').classList.add('visually-hidden');
+    document.querySelector('#picture-cancel').addEventListener('click', window.preview.hideImgPreview);
+  };
   window.preview = {
-    hideImgPreview: function () {
-      bigPicture.classList.add('hidden');
-      document.removeEventListener('keydown', window.util.onPopupEscPress);
-      document.querySelector('#picture-cancel').removeEventListener('click', this.hideImgPreview);
-    },
-    showImgPreview: function (image) {
-      fillImgPreview(image);
-      bigPicture.classList.remove('hidden');
-      document.querySelector('.social__comment-count').classList.add('visually-hidden');
-      document.querySelector('.social__comment-loadmore').classList.add('visually-hidden');
-      document.querySelector('#picture-cancel').addEventListener('click', window.preview.hideImgPreview);
-    }
+    hideImgPreview,
+    showImgPreview
   };
 })();

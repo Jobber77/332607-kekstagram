@@ -68,11 +68,6 @@
     return clickedImage;
   };
 
-  var setGaleryLiseners = function () {
-    document.querySelector('.pictures').addEventListener('click', onPictureClick);
-    document.querySelector('#upload-file').addEventListener('change', onFileInputClick);
-  };
-
   var onPictureClick = function (evt) {
     var target = evt.target.closest('a');
     if (target) {
@@ -84,6 +79,11 @@
   var onFileInputClick = function () {
     window.imgEditor.showEditorForm();
     document.addEventListener('keydown', window.util.onPopupEscPress);
+  };
+
+  var setGaleryLiseners = function () {
+    document.querySelector('.pictures').addEventListener('click', onPictureClick);
+    document.querySelector('#upload-file').addEventListener('change', onFileInputClick);
   };
 
   var mockImgList = getMockImgList();
