@@ -11,11 +11,11 @@
     var commentList = [];
     for (var i = 0; i < amount; i++) {
       //  random choose amount of composite comments
-      var compositeNumber = isComments ? this.getRandomNumber(1, 2) : 1;
+      var compositeNumber = isComments ? getRandomNumber(1, 2) : 1;
       compositeNumber = compositeNumber < list.length ? compositeNumber : list.length;
       var comment = '';
       for (var j = 0; j < compositeNumber; j++) {
-        comment += list[this.getRandomNumber(0, list.length - 1)];
+        comment += list[getRandomNumber(0, list.length - 1)];
       }
       commentList.push(comment);
     }
@@ -44,9 +44,9 @@
   };
 
   window.util = {
-    getRandomNumber,
-    getRandomList,
-    createDOMElement,
-    onPopupEscPress
+    getRandomNumber: getRandomNumber,
+    getRandomList: getRandomList,
+    createDOMElement: createDOMElement,
+    onPopupEscPress: onPopupEscPress
   };
 })();

@@ -51,7 +51,7 @@
       pin.style.left = newPosition + 'px';
       scaleLevel.style.width = newPosition + 'px';
       scaleValue.value = newPosition / scaleLine.offsetWidth;
-      setFilter(imgPreview, selectedfilter, scaleValue.value);
+      window.filters.setFilter(window.imgEditor.imgPreview, window.filters.selectedfilter, scaleValue.value);
     };
 
     document.addEventListener('mousemove', onMouseMove);
@@ -59,10 +59,10 @@
   };
   //  expose
   window.slider = {
-    onPinMove,
-    setInitialPinPostition,
-    showSlider,
-    hideSlider,
-    pin
+    onPinMove: onPinMove,
+    setInitialPinPostition: setInitialPinPostition,
+    showSlider: showSlider,
+    hideSlider: hideSlider,
+    pin: pin
   };
 })();

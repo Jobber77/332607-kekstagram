@@ -57,6 +57,6 @@
 
   // expose
   window.editorValidation = {
-    onInputTagValidation
-  }
+    onInputTagValidation: onInputTagValidation
+  };
 })();

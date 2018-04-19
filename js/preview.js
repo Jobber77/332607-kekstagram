@@ -42,7 +42,7 @@
   var hideImgPreview = function () {
     bigPicture.classList.add('hidden');
     document.removeEventListener('keydown', window.util.onPopupEscPress);
-    document.querySelector('#picture-cancel').removeEventListener('click', this.hideImgPreview);
+    document.querySelector('#picture-cancel').removeEventListener('click', window.preview.hideImgPreview);
   };
   var showImgPreview = function (image) {
     fillImgPreview(image);
@@ -52,7 +52,7 @@
     document.querySelector('#picture-cancel').addEventListener('click', window.preview.hideImgPreview);
   };
   window.preview = {
-    hideImgPreview,
-    showImgPreview
+    hideImgPreview: hideImgPreview,
+    showImgPreview: showImgPreview
   };
 })();

@@ -2,27 +2,15 @@
 'use strict';
 
 (function () {
+  //  #region constants
+  var FILTER_MAX_VALUE_GRAYSCALE = 1;
+  var FILTER_MAX_VALUE_SEPIA = 1;
+  var FILTER_MAX_VALUE_INVERT = 100;
+  var FILTER_MAX_VALUE_BLUR = 5;
+  var FILTER_MAX_VALUE_BRIGHTNESS = 3;
+  //  endregion
+
   var selectedfilter = 'none';
-
-  var setFilterLiseners = function () {
-    var filters = document.querySelectorAll('.effects__radio');
-    for (var i = 0; i < filters.length; i++) {
-      filters[i].addEventListener('click', onFilterClick);
-    }
-    document.querySelector('.resize__control--minus').addEventListener('click', onButtonResizeMinus);
-    document.querySelector('.resize__control--plus').addEventListener('click', onButtonResizePlus);
-    window.slider.pin.addEventListener('mousedown',  window.slider.onPinMove);
-  };
-
-  var killFilterLiseners = function () {
-    var filters = document.querySelectorAll('.effects__radio');
-    for (var i = 0; i < filters.length; i++) {
-      filters[i].removeEventListener('click', onFilterClick);
-    }
-    document.querySelector('.resize__control--minus').removeEventListener('click', onButtonResizeMinus);
-    document.querySelector('.resize__control--plus').removeEventListener('click', onButtonResizePlus);
-    window.slider.pin.removeEventListener('mousedown',  window.slider.onPinMove);
-  };
 
   var clearFilters = function (img) {
     img.classList.remove('effects__preview--none');
@@ -79,32 +67,35 @@
     if (target) {
       switch (target.value) {
         case 'chrome':
-          selectedfilter = 'chrome';
+          window.filters.selectedfilter = 'chrome';
           break;
         case 'sepia':
-          selectedfilter = 'sepia';
+          window.filters.selectedfilter = 'sepia';
           break;
         case 'marvin':
-          selectedfilter = 'marvin';
+          window.filters.selectedfilter = 'marvin';
           break;
         case 'phobos':
-          selectedfilter = 'phobos';
+          window.filters.selectedfilter = 'phobos';
           break;
         case 'heat':
-          selectedfilter = 'heat';
+          window.filters.selectedfilter = 'heat';
           break;
         case 'none':
-          selectedfilter = 'none';
+          window.filters.selectedfilter = 'none';
           window.slider.hideSlider();
           break;
       }
     }
-    setFilter(imgPreview, selectedfilter, 1);
+    setFilter(window.imgEditor.imgPreview, window.filters.selectedfilter, 1);
     window.slider.setInitialPinPostition();
   };
 
   //  expose
   window.filters = {
-
+    onFilterClick: onFilterClick,
+    clearFilters: clearFilters,
+    selectedfilter: selectedfilter,
+    setFilter: setFilter
   };
 })();

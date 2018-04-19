@@ -71,6 +71,7 @@
   var onPictureClick = function (evt) {
     var target = evt.target.closest('a');
     if (target) {
+      evt.preventDefault();
       window.preview.showImgPreview(findClickedPictureObject(target));
       document.addEventListener('keydown', window.util.onPopupEscPress);
     }

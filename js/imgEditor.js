@@ -2,14 +2,6 @@
 'use strict';
 
 (function () {
-  //  #region constants
-  var FILTER_MAX_VALUE_GRAYSCALE = 1;
-  var FILTER_MAX_VALUE_SEPIA = 1;
-  var FILTER_MAX_VALUE_INVERT = 100;
-  var FILTER_MAX_VALUE_BLUR = 5;
-  var FILTER_MAX_VALUE_BRIGHTNESS = 3;
-  //  endregion
-
   //  #region query variables
   var imgPreview = document.querySelector('.img-upload__preview > img');
   var resizeValue = document.querySelector('.resize__control--value');
@@ -46,6 +38,26 @@
     inputTagUpload.removeEventListener('blur', onInputFocusLost);
   };
 
+  var setFilterLiseners = function () {
+    var filters = document.querySelectorAll('.effects__radio');
+    for (var i = 0; i < filters.length; i++) {
+      filters[i].addEventListener('click', window.filters.onFilterClick);
+    }
+    document.querySelector('.resize__control--minus').addEventListener('click', onButtonResizeMinus);
+    document.querySelector('.resize__control--plus').addEventListener('click', onButtonResizePlus);
+    window.slider.pin.addEventListener('mousedown', window.slider.onPinMove);
+  };
+
+  var killFilterLiseners = function () {
+    var filters = document.querySelectorAll('.effects__radio');
+    for (var i = 0; i < filters.length; i++) {
+      filters[i].removeEventListener('click', window.filters.onFilterClick);
+    }
+    document.querySelector('.resize__control--minus').removeEventListener('click', onButtonResizeMinus);
+    document.querySelector('.resize__control--plus').removeEventListener('click', onButtonResizePlus);
+    window.slider.pin.removeEventListener('mousedown', window.slider.onPinMove);
+  };
+
   var onButtonResizeMinus = function () {
     var value = parseInt(resizeValue.value, 10);
     if (value > 0) {
@@ -76,23 +88,24 @@
     configureEditorForm();
     setFilterLiseners();
     setInputLiseners();
-    document.querySelector('#upload-cancel').addEventListener('click', this.hideEditorForm);
+    document.querySelector('#upload-cancel').addEventListener('click', hideEditorForm);
   };
 
   var hideEditorForm = function () {
     document.querySelector('.img-upload__overlay').classList.add('hidden');
     document.querySelector('#upload-file').value = '';
     document.removeEventListener('keydown', window.util.onPopupEscPress);
-    document.querySelector('#upload-cancel').removeEventListener('click', this.hideEditorForm);
-    clearFilters(imgPreview);
+    document.querySelector('#upload-cancel').removeEventListener('click', hideEditorForm);
+    window.filters.clearFilters(imgPreview);
     clearEditForm();
     killInputLiseners();
     killFilterLiseners();
-  }
+  };
 
   window.imgEditor = {
-    showEditorForm,
-    hideEditorForm
+    showEditorForm: showEditorForm,
+    hideEditorForm: hideEditorForm,
+    imgPreview: imgPreview
   };
 
 })();
