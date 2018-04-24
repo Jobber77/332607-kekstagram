@@ -8,6 +8,8 @@
   var textAreaUpload = document.querySelector('.text__description');
   var inputTagUpload = document.querySelector('.text__hashtags');
   var inputFile = document.querySelector('#upload-file');
+  var editForm = document.querySelector('.img-upload__form');
+  var editorOverlay = document.querySelector('.img-upload__overlay');
   //  #endregion
 
   var configureEditorForm = function () {
@@ -28,6 +30,7 @@
     inputTagUpload.addEventListener('blur', window.editorValidation.onInputTagValidation);
     textAreaUpload.addEventListener('blur', onInputFocusLost);
     inputTagUpload.addEventListener('blur', onInputFocusLost);
+    editForm.addEventListener('submit', onFormSubmit);
   };
 
   var killInputLiseners = function () {
@@ -36,6 +39,7 @@
     inputTagUpload.removeEventListener('blur', window.editorValidation.onInputTagValidation);
     textAreaUpload.removeEventListener('blur', onInputFocusLost);
     inputTagUpload.removeEventListener('blur', onInputFocusLost);
+    editForm.removeEventListener('submit', onFormSubmit);
   };
 
   var setFilterLiseners = function () {
@@ -84,7 +88,7 @@
 
   //  expose
   var showEditorForm = function () {
-    document.querySelector('.img-upload__overlay').classList.remove('hidden');
+    editorOverlay.classList.remove('hidden');
     configureEditorForm();
     setFilterLiseners();
     setInputLiseners();
@@ -92,7 +96,7 @@
   };
 
   var hideEditorForm = function () {
-    document.querySelector('.img-upload__overlay').classList.add('hidden');
+    editorOverlay.classList.add('hidden');
     document.querySelector('#upload-file').value = '';
     document.removeEventListener('keydown', window.util.onPopupEscPress);
     document.querySelector('#upload-cancel').removeEventListener('click', hideEditorForm);
@@ -100,6 +104,22 @@
     clearEditForm();
     killInputLiseners();
     killFilterLiseners();
+  };
+
+  var onFormSubmit = function (evt) {
+    window.backend.postData(new FormData(editForm), hideEditorForm, onLoadError);
+    evt.preventDefault();
+  };
+  var onLoadError = function (errorMessage) {
+    var node = document.createElement('div');
+    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: yellow; min-height: 50px; padding: 10px;';
+    node.style.position = 'absolute';
+    node.style.left = 0;
+    node.style.right = 0;
+    node.style.fontSize = '30px';
+    node.style.color = 'black';
+    node.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', node);
   };
 
   window.imgEditor = {
