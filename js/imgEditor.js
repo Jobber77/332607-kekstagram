@@ -90,6 +90,7 @@
   //  expose
   var showEditorForm = function () {
     editorOverlay.classList.remove('hidden');
+    document.querySelector('.img-upload__message--error').classList.add('hidden');
     configureEditorForm();
     setFilterLiseners();
     setInputLiseners();
@@ -111,16 +112,9 @@
     window.backend.postData(new FormData(editForm), postLink, hideEditorForm, onLoadError);
     evt.preventDefault();
   };
-  var onLoadError = function (errorMessage) {
-    var node = document.createElement('div');
-    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: yellow; min-height: 50px; padding: 10px;';
-    node.style.position = 'absolute';
-    node.style.left = 0;
-    node.style.right = 0;
-    node.style.fontSize = '30px';
-    node.style.color = 'black';
-    node.textContent = errorMessage;
-    document.body.insertAdjacentElement('afterbegin', node);
+  var onLoadError = function () {
+    document.querySelector('.img-upload__message--error').classList.remove('hidden');
+    //  hideEditorForm();
   };
 
   window.imgEditor = {

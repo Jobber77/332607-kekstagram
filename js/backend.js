@@ -44,7 +44,6 @@
     xhr.open('POST', link);
     xhr.setRequestHeader('content-type', 'multipart/form-data');
     xhr.send();
-    return xhr.response;
   };
 
   window.backend = {
