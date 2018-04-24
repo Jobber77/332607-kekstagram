@@ -9,7 +9,6 @@
     xhr.addEventListener('load', function () {
       if (xhr.status === 200) {
         onLoad(xhr.response);
-        return xhr.response;
       } else {
         onError('Cтатус ответа: ' + xhr.status + ' ' + xhr.statusText);
       }
@@ -23,7 +22,6 @@
     xhr.timeout = 10000; // 10 sec
     xhr.open('GET', link);
     xhr.send();
-
   };
   var postData = function (data, link, onLoad, onError) {
     var xhr = new XMLHttpRequest();
@@ -44,6 +42,7 @@
     });
     xhr.timeout = 10000; // 10 sec
     xhr.open('POST', link);
+    xhr.setRequestHeader('content-type', 'multipart/form-data');
     xhr.send();
     return xhr.response;
   };
