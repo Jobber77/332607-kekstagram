@@ -10,6 +10,7 @@
   var inputFile = document.querySelector('#upload-file');
   var editForm = document.querySelector('.img-upload__form');
   var editorOverlay = document.querySelector('.img-upload__overlay');
+  var postLink = 'https://js.dump.academy/kekstagram';
   //  #endregion
 
   var configureEditorForm = function () {
@@ -107,7 +108,7 @@
   };
 
   var onFormSubmit = function (evt) {
-    window.backend.postData(new FormData(editForm), hideEditorForm, onLoadError);
+    window.backend.postData(new FormData(editForm), postLink, hideEditorForm, onLoadError);
     evt.preventDefault();
   };
   var onLoadError = function (errorMessage) {
