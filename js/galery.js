@@ -39,7 +39,7 @@
   };
 
   var onPictureClick = function (evt) {
-    var target = evt.target.closest('a');
+    var target = evt.target.closest('.picture__link');
     if (target) {
       evt.preventDefault();
       window.preview.showImgPreview(findClickedPictureObject(target));

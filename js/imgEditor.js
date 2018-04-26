@@ -11,10 +11,12 @@
   var editForm = document.querySelector('.img-upload__form');
   var editorOverlay = document.querySelector('.img-upload__overlay');
   var postLink = 'https://js.dump.academy/kekstagram';
+  var submitButton = document.querySelector('.img-upload__submit');
   //  #endregion
 
   var configureEditorForm = function () {
     resizeValue.value = '100%';
+    submitButton.disabled = false;
     window.slider.hideSlider();
     document.querySelector('#effect-none').checked = true;
   };
@@ -108,13 +110,18 @@
     killFilterLiseners();
   };
 
+  var lockSubmitButton = function () {
+    submitButton.disabled = true;
+  };
+
   var onFormSubmit = function (evt) {
+    lockSubmitButton();
     window.backend.postData(new FormData(editForm), postLink, hideEditorForm, onLoadError);
     evt.preventDefault();
   };
   var onLoadError = function () {
+    hideEditorForm();
     document.querySelector('.img-upload__message--error').classList.remove('hidden');
-    //  hideEditorForm();
   };
 
   window.imgEditor = {
