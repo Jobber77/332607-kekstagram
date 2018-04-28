@@ -50,7 +50,7 @@
       startXCoords = moveEvent.clientX;
       pin.style.left = newPosition + 'px';
       scaleLevel.style.width = newPosition + 'px';
-      scaleValue.value = newPosition / scaleLine.offsetWidth;
+      scaleValue.value = Math.round(newPosition / scaleLine.offsetWidth * 100);
       window.filters.setFilter(window.imgEditor.imgPreview, window.filters.selectedfilter, scaleValue.value);
     };
 

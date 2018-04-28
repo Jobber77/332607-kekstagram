@@ -15,6 +15,7 @@
 
   var fillImgPreview = function (imgObject) {
     document.querySelector('.big-picture__img img').src = imgObject.url;
+    document.querySelector('.big-picture__social .social__caption').textContent = imgObject.comments[0];
     document.querySelector('.big-picture__social .likes-count').textContent = imgObject.likes;
     document.querySelector('.big-picture__social .comments-count').textContent = imgObject.comments.length;
     bigPictureCommentsContainer.innerHTML = '';

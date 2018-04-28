@@ -8,10 +8,16 @@
   var textAreaUpload = document.querySelector('.text__description');
   var inputTagUpload = document.querySelector('.text__hashtags');
   var inputFile = document.querySelector('#upload-file');
+  var editForm = document.querySelector('.img-upload__form');
+  var editorOverlay = document.querySelector('.img-upload__overlay');
+  var postLink = 'https://js.dump.academy/kekstagram';
+  var submitButton = document.querySelector('.img-upload__submit');
+  var editorFormData;
   //  #endregion
 
   var configureEditorForm = function () {
     resizeValue.value = '100%';
+    submitButton.disabled = false;
     window.slider.hideSlider();
     document.querySelector('#effect-none').checked = true;
   };
@@ -28,6 +34,7 @@
     inputTagUpload.addEventListener('blur', window.editorValidation.onInputTagValidation);
     textAreaUpload.addEventListener('blur', onInputFocusLost);
     inputTagUpload.addEventListener('blur', onInputFocusLost);
+    editForm.addEventListener('submit', onFormSubmit);
   };
 
   var killInputLiseners = function () {
@@ -36,6 +43,7 @@
     inputTagUpload.removeEventListener('blur', window.editorValidation.onInputTagValidation);
     textAreaUpload.removeEventListener('blur', onInputFocusLost);
     inputTagUpload.removeEventListener('blur', onInputFocusLost);
+    editForm.removeEventListener('submit', onFormSubmit);
   };
 
   var setFilterLiseners = function () {
@@ -84,7 +92,8 @@
 
   //  expose
   var showEditorForm = function () {
-    document.querySelector('.img-upload__overlay').classList.remove('hidden');
+    editorOverlay.classList.remove('hidden');
+    document.querySelector('.img-upload__message--error').classList.add('hidden');
     configureEditorForm();
     setFilterLiseners();
     setInputLiseners();
@@ -92,7 +101,7 @@
   };
 
   var hideEditorForm = function () {
-    document.querySelector('.img-upload__overlay').classList.add('hidden');
+    editorOverlay.classList.add('hidden');
     document.querySelector('#upload-file').value = '';
     document.removeEventListener('keydown', window.util.onPopupEscPress);
     document.querySelector('#upload-cancel').removeEventListener('click', hideEditorForm);
@@ -100,6 +109,21 @@
     clearEditForm();
     killInputLiseners();
     killFilterLiseners();
+  };
+
+  var lockSubmitButton = function () {
+    submitButton.disabled = true;
+  };
+
+  var onFormSubmit = function (evt) {
+    lockSubmitButton();
+    editorFormData = new FormData(editForm);
+    window.backend.postData(editorFormData, postLink, hideEditorForm, onLoadError);
+    evt.preventDefault();
+  };
+  var onLoadError = function () {
+    hideEditorForm();
+    document.querySelector('.img-upload__message--error').classList.remove('hidden');
   };
 
   window.imgEditor = {
