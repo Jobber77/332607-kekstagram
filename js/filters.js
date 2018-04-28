@@ -25,7 +25,7 @@
   var setFilter = function (img, filterName, filterIntensiveness) {
     var filterClass = 'effects__preview--none';
     var filterCSS = '';
-    var level = filterIntensiveness;
+    var level = filterIntensiveness / 100;
     switch (filterName) {
       case 'chrome':
         filterClass = 'effects__preview--chrome';
@@ -87,7 +87,7 @@
           break;
       }
     }
-    setFilter(window.imgEditor.imgPreview, window.filters.selectedfilter, 1);
+    setFilter(window.imgEditor.imgPreview, window.filters.selectedfilter, 100);
     window.slider.setInitialPinPostition();
   };
 
