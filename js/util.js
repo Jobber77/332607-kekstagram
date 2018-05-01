@@ -3,6 +3,8 @@
 
 (function () {
   var ESC_KEYCODE = 27;
+  var DEBOUNCE_INTERVAL = 500;
+  var lastTimeout;
 
   var getRandomNumber = function (min, max) {
     return Math.round(Math.random() * (max - min) + min);
@@ -42,11 +44,18 @@
       window.imgEditor.hideEditorForm();
     }
   };
+  var debounce = function (fun) {
+    if (lastTimeout) {
+      window.clearTimeout(lastTimeout);
+    }
+    lastTimeout = window.setTimeout(fun, DEBOUNCE_INTERVAL);
+  };
 
   window.util = {
     getRandomNumber: getRandomNumber,
     getRandomList: getRandomList,
     createDOMElement: createDOMElement,
-    onPopupEscPress: onPopupEscPress
+    onPopupEscPress: onPopupEscPress,
+    debounce: debounce
   };
 })();
