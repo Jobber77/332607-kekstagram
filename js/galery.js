@@ -2,19 +2,15 @@
 'use strict';
 
 (function () {
-  //  #region constants
-  var LINK_TO_PICTURES = 'https://js.dump.academy/kekstagram/data';
-  //  endregion
-
   //  source IMG array
-  var ImgList = [];
+  var imgList = [];
   var filterButtons = document.querySelectorAll('.img-filters__button');
   var activeFilter = 'filter-popular';
 
   var drawPictures = function (pictures) {
     //  fill source img array if this is first function call
-    if (ImgList.length === 0) {
-      ImgList = addIndex(pictures).slice();
+    if (imgList.length === 0) {
+      imgList = addIndex(pictures).slice();
     }
     pictures = activeFilterToMethod[activeFilter](pictures);
     clearPictures();
@@ -56,7 +52,7 @@
     return list;
   };
   var filterNew = function () {
-    return ImgList.slice();
+    return imgList.slice();
   };
   var filterDiscussed = function (list) {
     list.sort(function (prev, next) {
@@ -68,9 +64,9 @@
   var findClickedPictureObject = function (clickedDOMelement) {
     var id = clickedDOMelement.pictureId;
     var clickedImage = {};
-    for (var i = 0; i < ImgList.length; i++) {
-      if (ImgList[i].id === id) {
-        clickedImage = ImgList[id];
+    for (var i = 0; i < imgList.length; i++) {
+      if (imgList[i].id === id) {
+        clickedImage = imgList[id];
       }
     }
     return clickedImage;
@@ -87,7 +83,7 @@
       clearFiltersActiveStatus();
       evt.target.classList.add('img-filters__button--active');
       activeFilter = evt.target.id;
-      window.util.debounce(drawPictures(ImgList.slice()));
+      window.util.debounce(drawPictures(imgList.slice()));
     }
   };
 
@@ -124,7 +120,7 @@
       button.addEventListener('click', onGaleryFilterClick);
     });
   };
-  window.backend.getData(LINK_TO_PICTURES, drawPictures, onLoadError);
+  window.backend.getData(drawPictures, onLoadError);
   setGaleryLiseners();
 
   var activeFilterToMethod = {

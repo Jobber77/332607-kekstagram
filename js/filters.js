@@ -64,28 +64,11 @@
     var target = env.target.closest('input');
     window.slider.showSlider();
     // check if object is found
-    if (target) {
-      switch (target.value) {
-        case 'chrome':
-          window.filters.selectedfilter = 'chrome';
-          break;
-        case 'sepia':
-          window.filters.selectedfilter = 'sepia';
-          break;
-        case 'marvin':
-          window.filters.selectedfilter = 'marvin';
-          break;
-        case 'phobos':
-          window.filters.selectedfilter = 'phobos';
-          break;
-        case 'heat':
-          window.filters.selectedfilter = 'heat';
-          break;
-        case 'none':
-          window.filters.selectedfilter = 'none';
-          window.slider.hideSlider();
-          break;
-      }
+    if (target.value) {
+      window.filters.selectedfilter = target.value;
+    }
+    if (target.value === 'none') {
+      window.slider.hideSlider();
     }
     setFilter(window.imgEditor.imgPreview, window.filters.selectedfilter, 100);
     window.slider.setInitialPinPostition();
