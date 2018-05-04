@@ -53,6 +53,7 @@
     document.querySelector('.resize__control--minus').addEventListener('click', onButtonResizeMinus);
     document.querySelector('.resize__control--plus').addEventListener('click', onButtonResizePlus);
     window.slider.pin.addEventListener('mousedown', window.slider.onPinMove);
+    window.slider.pin.addEventListener('keydown', window.slider.onArrowKeyPress);
   };
 
   var killFilterLiseners = function () {
@@ -63,6 +64,7 @@
     document.querySelector('.resize__control--minus').removeEventListener('click', onButtonResizeMinus);
     document.querySelector('.resize__control--plus').removeEventListener('click', onButtonResizePlus);
     window.slider.pin.removeEventListener('mousedown', window.slider.onPinMove);
+    window.slider.pin.removeEventListener('keydown', window.slider.onArrowKeyPress);
   };
 
   var onButtonResizeMinus = function () {

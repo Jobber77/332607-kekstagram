@@ -52,7 +52,7 @@
         counter++;
       }
     });
-    return counter > 1 ? true : false;
+    return counter > 1;
   };
 
   // expose

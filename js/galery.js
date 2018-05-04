@@ -16,6 +16,8 @@
     clearPictures();
     var fragment = document.createDocumentFragment();
     var template = document.querySelector('#picture').content;
+    //  temporary fix for odd picture from server
+    pictures.pop();
     pictures.forEach(function (picture) {
       var aElementToClone = template.querySelector('.picture__link').cloneNode(true);
       aElementToClone.pictureId = picture.id;
