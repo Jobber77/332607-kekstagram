@@ -10,7 +10,6 @@
   var inputFile = document.querySelector('#upload-file');
   var editForm = document.querySelector('.img-upload__form');
   var editorOverlay = document.querySelector('.img-upload__overlay');
-  var postLink = 'https://js.dump.academy/kekstagram';
   var submitButton = document.querySelector('.img-upload__submit');
   var editorFormData;
   //  #endregion
@@ -54,6 +53,7 @@
     document.querySelector('.resize__control--minus').addEventListener('click', onButtonResizeMinus);
     document.querySelector('.resize__control--plus').addEventListener('click', onButtonResizePlus);
     window.slider.pin.addEventListener('mousedown', window.slider.onPinMove);
+    window.slider.pin.addEventListener('keydown', window.slider.onArrowKeyPress);
   };
 
   var killFilterLiseners = function () {
@@ -64,6 +64,7 @@
     document.querySelector('.resize__control--minus').removeEventListener('click', onButtonResizeMinus);
     document.querySelector('.resize__control--plus').removeEventListener('click', onButtonResizePlus);
     window.slider.pin.removeEventListener('mousedown', window.slider.onPinMove);
+    window.slider.pin.removeEventListener('keydown', window.slider.onArrowKeyPress);
   };
 
   var onButtonResizeMinus = function () {
@@ -118,7 +119,7 @@
   var onFormSubmit = function (evt) {
     lockSubmitButton();
     editorFormData = new FormData(editForm);
-    window.backend.postData(editorFormData, postLink, hideEditorForm, onLoadError);
+    window.backend.postData(editorFormData, hideEditorForm, onLoadError);
     evt.preventDefault();
   };
   var onLoadError = function () {

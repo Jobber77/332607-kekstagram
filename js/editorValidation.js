@@ -13,12 +13,12 @@
       input.style.border = '';
     }
   };
-  var validateTags = function (string) {
+  var validateTags = function (inputString) {
     var errors = [];
-    if (!string) {
+    if (!inputString) {
       return errors;
     }
-    var tags = string.split(' ');
+    var tags = inputString.split(' ');
     var flagLength = false;
     var flagStartFromSharp = false;
     var flagTooShort = false;
@@ -52,7 +52,7 @@
         counter++;
       }
     });
-    return counter > 1 ? true : false;
+    return counter > 1;
   };
 
   // expose
