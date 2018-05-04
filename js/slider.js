@@ -61,7 +61,7 @@
       }
     };
     var calculateNewPosition = function (moveEvent) {
-      //  1 === left, 2 === right
+      //  1 === left, -1 === right
       var shiftDirection = moveEvent.keyCode === 	LEFT_ARROW_KEYCODE ? 1 : -1;
       var newPosition = pin.offsetLeft - SHIFT_PER_TICK * shiftDirection;
       newPosition = validateNewPosition(newPosition);
